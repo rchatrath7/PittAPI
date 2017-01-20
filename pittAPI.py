@@ -46,6 +46,34 @@ class CourseAPI:
         courses.extend(courses_even)
         return courses
 
+    def get_subject_codes(self):
+        """
+        :returns: a list of strings of the SUBJECT codes
+        """
+
+        url = 'http://www.courses.as.pitt.edu/subj-index.html'
+
+        subjects  = self._retrieve_from_url(url)
+
+        subject_codes = []
+
+        # A List of Subject Codes that are not useful
+        UNWANTED_CODES = [
+            'various subjects',
+            'FILMST + other subjects',
+            'MRST + other subjects',
+            'URBNST + other subjects'
+        ]
+
+        for course in subjects:
+            details = [course_detail.string.replace('&nbsp', '').strip()
+                        if course_detail.string is not None else 'Not Decided'
+                        for course_detail in course]
+            if details[3] not in UNWANTED_CODES:
+                subject_codes.append(details[3])
+
+        return subject_codes
+
     def get_courses(self, term, subject):
         # type: (str, str) -> List[Dict[str, str]]
         """
